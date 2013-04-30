@@ -1,16 +1,16 @@
-import time
 import datetime
 import os
 import sqlite3
 import subprocess
+import time
 
 
 cups_pagelog_location    = './sample_page_log'
 default_page_quota       = 400
 disable_printing_command = [ 'touch', 'user_disabled' ] #command and one entry per argument
 sleep_duration           = 10 #in seconds
-  
-  
+
+
 def increasePagecountGetState(username, pagenumber, jobtime):
 
     state = db_cursor.execute( 'SELECT pagecount, pagequota, lastjob FROM users where username = ?', ( username, ) ).fetchone();
@@ -19,7 +19,7 @@ def increasePagecountGetState(username, pagenumber, jobtime):
     
         db_cursor.execute( 'INSERT INTO users (username, pagequota, pagecount, lastjob ) VALUES (?, ?, ?, ? );', ( username, default_page_quota, pagenumber, jobtime ) );
         return ( username, pagenumber, default_page_quota )
-        
+    
     else:
     
         if jobtime >= state[2]:

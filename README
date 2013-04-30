@@ -1,3 +1,3 @@
 This is a small Python script to be used as a deamon to enact printing quotas for CUPS. It tracks CUPS' page_log and maintains a SQLite database to store the printed pages for each user. You can supply an external command to take away printer access from a user when the page quota is reached.
 
-The script handles log rotations properly.
+The script handles log rotations properly. The timezone information in the log's time information is not taken into account.
