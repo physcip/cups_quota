@@ -1,14 +1,9 @@
 import datetime
 import os
-import sqlite3
 import subprocess
 import time
-
-
-cups_pagelog_location    = './sample_page_log'
-default_page_quota       = 400
-disable_printing_command = [ 'touch', 'user_disabled' ] #command and one entry per argument
-sleep_duration           = 10 #in seconds
+import sys
+from config import *
 
 
 def increasePagecountGetState(username, pagenumber, jobtime):
@@ -37,8 +32,6 @@ def disablePrinting(username):
     subprocess.call( disable_printing_command )
 
 
-db_conn   = sqlite3.connect( 'print_quota.db' )
-db_cursor = db_conn.cursor()
 pagelog   = open( cups_pagelog_location, 'r' )
 
 while True:
