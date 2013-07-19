@@ -43,7 +43,7 @@ while True:
         if os.path.exists( cups_pagelog_location ):
 
             if os.fstat( pagelog.fileno() ).st_ino != os.stat( cups_pagelog_location ).st_ino or \
-               os.fstat( pagelog.fileno() ).st_dev != os.stat( cups_pagelog_location ).st_dev      :
+               os.fstat( pagelog.fileno() ).st_dev != os.stat( cups_pagelog_location ).st_dev:
 
                 pagelog.close()
                 pagelog = open( cups_pagelog_location, 'r' )
@@ -70,5 +70,4 @@ while True:
                 username, pagecount, pagequota = increasePagecountGetState( log_username, log_pages, log_datetime )
                 
                 if pagecount >= pagequota:
-                
                     disablePrinting( username )
