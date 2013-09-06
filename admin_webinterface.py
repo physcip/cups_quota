@@ -22,32 +22,38 @@ html_footer = """
 </html>
 """
 
+def user_query():
+    html = []
+    html.append( """<form action="admin_webinterface.py" method="post">""" )
+    html.append( """<input type="text" name="username" />""" )
+    html.append( """</form>""" )
+    return html
 
 def user_quota_list():
 
     html = []
     
-    html.append( "<table>" )
+    html.append( """<table>""" )
     
     for entry in db_cursor.execute('SELECT username, pagecount, pagequota FROM users ORDER BY username ASC'):
     
-        html.append( "<tr>" )
+        html.append( """<tr>""" )
         
-        html.append( "<td>" )
+        html.append( """<td>""" )
         html.append( str( entry[0] ) )
-        html.append( "</td>" )
+        html.append( """</td>""" )
         
-        html.append( "<td>" )
-        html.append( "<form action=\"admin_webinterface.py\" method=\"post\">" )
-        html.append( "<input type=\"text\" name=\"pagecount\" value=\"%s\"> / <input type=\"text\" name=\"pagequota\" value=\"%s\"> " % ( str( entry[1] ), str( entry[2] ) ) )
-        html.append( "<input type=\"hidden\" name=\"username\" value=\"%s\">" % ( str( entry[0] ) ) )
-        html.append( "<input type=\"submit\" value=\"save\">" )
-        html.append( "</form>" )
-        html.append( "</td>" )
+        html.append( """<td>""" )
+        html.append( """<form action="admin_webinterface.py" method="post">""" )
+        html.append( """<input type="text" name="pagecount" value="%s"> / <input type="text" name="pagequota" value="%s"> """ % ( str( entry[1] ), str( entry[2] ) ) )
+        html.append( """<input type="hidden" name="username" value="%s">""" % ( str( entry[0] ) ) )
+        html.append( """<input type="submit" value="save">""" )
+        html.append( """</form>""" )
+        html.append( """</td>""" )
         
-        html.append( "</tr>" )
+        html.append( """</tr>""" )
         
-    html.append( "</table>" )
+    html.append( """</table>""" )
 
     return html
 

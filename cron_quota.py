@@ -26,7 +26,7 @@ def increasePagecountMonthly():
         print "# # # Updating...",
 	for i in range(passed_months):
 	    print i+1,
-            db_cursor.execute( 'UPDATE users SET pagequota = CASE WHEN pagequota + 100 > 600 THEN 600 ELSE pagequota + 100 END;' )
+            db_cursor.execute( 'UPDATE users SET pagequota = CASE WHEN pagequota + 100 > ? THEN ? ELSE pagequota + 100 END;', [default_page_quota,default_page_quota])
 
 increasePagecountMonthly()
 db_conn.commit()
