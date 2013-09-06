@@ -2,63 +2,70 @@ from wsgiref.simple_server import make_server
 from wsgiref.util          import setup_testing_defaults
 from cgi                   import parse_qs, escape
 from config                import *
+import re
 
 
-html_header = """
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+html_header = \
+"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
     <head>
         <style type="text/css">
-            input { width:3em }
+            .pageinput{ width:3em }
         </style>
     </head>
     <body>
-        <b>General:</b> <input type="button" value="test" onclick="alert('test')">
-        <hr>
 """
 
-html_footer = """
+html_footer = \
+"""
     </body>
 </html>
 """
 
-def user_query():
+
+def user_interface(env, start_response):
+
+    setup_testing_defaults(env)
+    
+    try:
+      request_body_size = int( env.get( 'CONTENT_LENGTH', 0 ) )
+    except ValueError:
+      request_body_size = 0
+      
+    request_body = env['wsgi.input'].read( request_body_size )
+    d = parse_qs( request_body )
+    
+    username = escape( d.get( 'username', [''] )[0] )
+    pagecount, pagequota = ('', '')
+    if len( username ) > 0:
+    
+        try:
+            pagecount, pagequota = db_cursor.execute( 'SELECT pagecount, pagequota FROM users WHERE username = ?;', [username] ).fetchone()
+            no_such_user = False
+        except:
+            no_such_user = True
+
+    status = '200 OK'
+    headers = [ ('Content-type', 'text/html') ]
+
+    start_response( status, headers )
+    
     html = []
-    html.append( """<form action="admin_webinterface.py" method="post">""" )
-    html.append( """<input type="text" name="username" />""" )
+    html.append( html_header )
+    html.append( """<form method="post">""" )
+    html.append( """<p>Input yout username to query your page quota, that is left over.</p>""" )
+    html.append( """<input type="text" name="username" value="%s"/>""" % (username)	 )
+    if (pagecount != '' and pagequota != ''):
+        html.append( """<p>User <b>%s</b> has used <b>%s</b> out of <b>%s</b> pages.</p>""" % (username, pagecount, pagequota) )
+    elif (no_such_user):
+        html.append( """<p>User <b>%s</b> is not in our system.</p>""" % (username) )
     html.append( """</form>""" )
-    return html
-
-def user_quota_list():
-
-    html = []
+    html.append( html_footer )
     
-    html.append( """<table>""" )
-    
-    for entry in db_cursor.execute('SELECT username, pagecount, pagequota FROM users ORDER BY username ASC'):
-    
-        html.append( """<tr>""" )
-        
-        html.append( """<td>""" )
-        html.append( str( entry[0] ) )
-        html.append( """</td>""" )
-        
-        html.append( """<td>""" )
-        html.append( """<form action="admin_webinterface.py" method="post">""" )
-        html.append( """<input type="text" name="pagecount" value="%s"> / <input type="text" name="pagequota" value="%s"> """ % ( str( entry[1] ), str( entry[2] ) ) )
-        html.append( """<input type="hidden" name="username" value="%s">""" % ( str( entry[0] ) ) )
-        html.append( """<input type="submit" value="save">""" )
-        html.append( """</form>""" )
-        html.append( """</td>""" )
-        
-        html.append( """</tr>""" )
-        
-    html.append( """</table>""" )
-
     return html
 
 
-def application(env, start_response):
+def admin_interface(env, start_response):
 
     setup_testing_defaults(env)
     
@@ -95,11 +102,58 @@ def application(env, start_response):
     html = []
     html.append( html_header )
     
-    html.extend( user_quota_list() )
+    html.append( """<table>""" )
+    
+    for entry in db_cursor.execute('SELECT username, pagecount, pagequota FROM users ORDER BY username ASC'):
+    
+        html.append( """<tr>""" )
+        
+        html.append( """<td>""" )
+        html.append( str( entry[0] ) )
+        html.append( """</td>""" )
+        
+        html.append( """<td>""" )
+        html.append( """<form method="post">""" )
+        html.append( """<input type="text" name="pagecount" value="%s" class="pageinput"> / <input type="text" name="pagequota" value="%s" class="pageinput"> """ % ( str( entry[1] ), str( entry[2] ) ) )
+        html.append( """<input type="hidden" name="username" value="%s">""" % ( str( entry[0] ) ) )
+        html.append( """<input type="submit" value="save">""" )
+        html.append( """</form>""" )
+        html.append( """</td>""" )
+        
+        html.append( """</tr>""" )
+        
+    html.append( """</table>""" )
     
     html.append( html_footer )
-    
+
     return html
+    
+    
+def not_found(env, start_response):
+
+    start_response('404 NOT FOUND', [('Content-Type', 'text/plain')])
+    return ['Not Found']
+    
+
+def application(env, start_response):
+    
+    urls = [
+        (r'^$', user_interface),
+        (r'admin/?$', admin_interface)
+    ]
+
+    path = env.get('PATH_INFO', '').lstrip('/')
+    
+    for regex, callback in urls:
+    
+        match = re.search(regex, path)
+
+        if match is not None:
+        
+            env['myapp.url_args'] = match.groups()
+            return callback(env, start_response)
+            
+    return not_found(env, start_response)
     
 
 httpd = make_server( '', webinterface_port, application )
