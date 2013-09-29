@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-7"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>de.uni-stuttgart.physcip.cupsquota</string>
+	<key>displayName</key>
+	<string>CUPS Quota System at /quota</string>
+	<key>launchKeys</key>
+	<array/>
+	<key>proxies</key>
+	<dict/>
+	<key>installationIndicatorFilePath</key>
+	<string>/Library/Server/Web/Data/WebApps/cups_quota/admin.wsgi</string>
+	<key>includeFiles</key>
+	<array>
+		<string>/Library/Server/Web/Config/apache2/httpd_cupsquota.conf</string>
+	</array>
+	<key>requiredModuleNames</key>
+	<array>
+		<string>wsgi_module</string>
+	</array>
+</dict>
+</plist>

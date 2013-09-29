@@ -1,8 +1,12 @@
-from wsgiref.simple_server import make_server
-from wsgiref.util          import setup_testing_defaults
+#!/usr/bin/env python
+
 from cgi                   import parse_qs, escape
-from config                import *
 import re
+
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
+from config                import *
 
 
 html_header = \
@@ -44,6 +48,8 @@ def user_interface(env, start_response):
             no_such_user = False
         except:
             no_such_user = True
+    else:
+        no_such_user = True
 
     status = '200 OK'
     headers = [ ('Content-type', 'text/html') ]
@@ -155,7 +161,14 @@ def application(env, start_response):
             
     return not_found(env, start_response)
     
+if __name__ == '__main__':
 
-httpd = make_server( '', webinterface_port, application )
-print "Serving on port 8000..."
-httpd.serve_forever()
+	from wsgiref.simple_server import make_server
+	from wsgiref.util          import setup_testing_defaults
+	httpd = make_server( '', webinterface_port, application )
+	print "Serving on port 8000..."
+	httpd.serve_forever()
+
+else:
+	def setup_testing_defaults(env):
+		pass
