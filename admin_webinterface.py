@@ -6,6 +6,7 @@ import re
 import sys
 import os
 sys.path.append(os.path.dirname(__file__))
+os.chdir(os.path.dirname(__file__))
 from config                import *
 
 
@@ -36,7 +37,7 @@ def user_interface(env, start_response):
     except ValueError:
       request_body_size = 0
       
-    request_body = env['wsgi.input'].read( request_body_size )
+    request_body = env['QUERY_STRING']
     d = parse_qs( request_body )
     
     username = escape( d.get( 'username', [''] )[0] )
@@ -58,12 +59,12 @@ def user_interface(env, start_response):
     
     html = []
     html.append( html_header )
-    html.append( """<form method="post">""" )
+    html.append( """<form method="get">""" )
     html.append( """<p>Input yout username to query your page quota, that is left over.</p>""" )
     html.append( """<input type="text" name="username" value="%s"/>""" % (username)	 )
     if (pagecount != '' and pagequota != ''):
         html.append( """<p>User <b>%s</b> has used <b>%s</b> out of <b>%s</b> pages.</p>""" % (username, pagecount, pagequota) )
-    elif (no_such_user):
+    elif (no_such_user and len(username) > 0):
         html.append( """<p>User <b>%s</b> is not in our system.</p>""" % (username) )
     html.append( """</form>""" )
     html.append( html_footer )
