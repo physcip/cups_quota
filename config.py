@@ -7,5 +7,5 @@ sleep_duration           = 10 #in seconds
 
 webinterface_port        = 8000
 
-db_conn   = sqlite3.connect( 'print_quota.db' )
+db_conn   = sqlite3.connect( 'db/print_quota.db' )
 db_cursor = db_conn.cursor()
