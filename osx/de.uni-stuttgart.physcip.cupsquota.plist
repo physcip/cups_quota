@@ -14,7 +14,7 @@
 	<string>/Library/Server/Web/Data/WebApps/cups_quota/admin.wsgi</string>
 	<key>includeFiles</key>
 	<array>
-		<string>/Library/Server/Web/Config/apache2/httpd_cupsquota.conf</string>
+		<string>/Library/Server/Web/Data/WebApps/cups_quota/osx/httpd_cupsquota.conf</string>
 	</array>
 	<key>requiredModuleNames</key>
 	<array>
