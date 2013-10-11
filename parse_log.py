@@ -31,11 +31,6 @@ def increasePagecountGetState(username, pagenumber, jobtime):
             return ( username, state[0], state[1] );
 
 
-def disablePrinting(username):
-
-    subprocess.call( disable_printing_command )
-
-
 pagelog   = open( cups_pagelog_location, 'r' )
 
 while True:
