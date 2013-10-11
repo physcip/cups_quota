@@ -16,8 +16,8 @@ def increasePagecountGetState(username, pagenumber, jobtime):
     
     if state == None:
     
-        db_cursor.execute( 'INSERT INTO users (username, pagequota, pagecount, lastjob ) VALUES (?, ?, ?, ? );', ( username, default_page_quota, pagenumber, jobtime ) );
-        print "Creating user %s with quota=%d, pages=%d" % (username, default_page_quota, pagenumber)
+        db_cursor.execute( 'INSERT INTO users (username, pagequota, pagecount, lastjob ) VALUES (?, ?, ?, ? );', ( username, default_page_quota, initial_page_number+pagenumber, jobtime ) );
+        print "Creating user %s with quota=%d, pages=%d" % (username, default_page_quota, initial_page_number+pagenumber)
         return ( username, pagenumber, default_page_quota )
     
     else:

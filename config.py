@@ -1,11 +1,11 @@
 import sqlite3
 import subprocess
 
-cups_pagelog_location    = './sample_page_log'
-default_page_quota       = 100
-max_page_quota           = 600
-monthly_quota_increase   = 100
-sleep_duration           = 10 #in seconds
+cups_pagelog_location       = './sample_page_log'
+default_page_quota          = 600
+initial_page_number         = 500
+monthly_pagenumber_decrease = 100
+sleep_duration              = 10 #in seconds
 
 def disablePrinting(username):
     subprocess.call( ['touch', 'disable_' + username] )

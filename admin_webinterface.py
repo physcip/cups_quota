@@ -64,7 +64,7 @@ def user_interface(env, start_response):
     html.append( """<p>Input yout username to query your page quota, that is left over.</p>""" )
     html.append( """<input type="text" name="username" value="%s"/>""" % (username)	 )
     if (pagecount != '' and pagequota != ''):
-        html.append( """<p>User <b>%s</b> has used <b>%s</b> out of <b>%s</b> pages.</p>""" % (username, pagecount, pagequota) )
+        html.append( """<p>User <b>%s</b> has <b>%s</b> pages left for this month.</p>""" % (username, pagequota-pagecount) )
     elif (no_such_user and len(username) > 0):
         html.append( """<p>User <b>%s</b> is not in our system.</p>""" % (username) )
     html.append( """</form>""" )
@@ -72,7 +72,7 @@ def user_interface(env, start_response):
     current_time = datetime.datetime.now()
     first_of_next_month = datetime.datetime(current_time.year +current_time.month//12, (current_time.month+1) % 12, 1, 0, 0, 0, 0)
     
-    html.append( "<p>Your quota will be increased by %d pages on %s.</p>" % (100 if (pagequota-pagecount)+100<=600 else 600-pagequota+pagecount, first_of_next_month.strftime('%Y-%m-%d')))
+    html.append( "<p>Your quota will be increased by %d pages on %s.</p>" % ( monthly_pagenumber_decrease if pagecount-monthly_pagenumber_decrease>0 else pagecount, first_of_next_month.strftime('%Y-%m-%d')))
     html.append( html_footer )
     
     return html

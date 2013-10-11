@@ -27,17 +27,16 @@ def increasePagecountMonthly():
     passed_months = (current_year*12 + current_month) - (lastupdate_dt.year*12 + lastupdate_dt.month)
     print "Months passed since last update:", passed_months
 
-    pages_to_add = monthly_quota_increase * passed_months
-    users_to_activate = db_execute( 'SELECT username FROM users WHERE pagequota <= 0 AND pagequota + ? > 0', [pages_to_add] )
+    pages_to_substract = monthly_pagenumber_decrease * passed_months
 
-    for user in db_cursor.execute('SELECT username FROM users WHERE pagequota <= 0 AND pagequota + ? > 0', [pages_to_add]):
+    for user in db_cursor.execute('SELECT username FROM users WHERE pagecount >= pagequota AND pagecount - ? < pagequota', [pages_to_substract]):
         enablePrinting(user[0])
 
     if (lastupdate < first_of_this_month):
-        # Increase pagequota for everyone by 100 if pagequota won't exceed 600, else set it to 600
+        # decrease pagenumber for everyone by 100 if pagenumber won't go negative, else set it to 0
         db_cursor.execute( 'UPDATE config SET value = ? WHERE key == "lastupdate";', [now_update] )
         print "# # # Updating...",
-        db_cursor.execute( 'UPDATE users SET pagequota = CASE WHEN pagequota + ? > ? THEN ? ELSE pagequota + ? END;', [pages_to_add, max_page_quota, max_page_quota, pages_to_add] )
+        db_cursor.execute( 'UPDATE users SET pagecount = CASE WHEN pagecount - ? < 0 THEN 0 ELSE pagecount - ? END;', [pages_to_substract, pages_to_substract] )
 
     db_conn.commit()
 
