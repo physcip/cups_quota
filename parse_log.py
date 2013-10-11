@@ -7,6 +7,8 @@ import time
 import sys
 from config import *
 
+script_start_time = time.time()
+
 
 def increasePagecountGetState(username, pagenumber, jobtime):
 
@@ -20,7 +22,7 @@ def increasePagecountGetState(username, pagenumber, jobtime):
     
     else:
     
-        if jobtime > state[2]:
+        if jobtime > state[2] or (jobtime >= state[2] and (time.time() > script_start_time+60)):
         
             db_cursor.execute( 'UPDATE users SET pagecount = pagecount + ?, lastjob = ? WHERE username = ?;', ( pagenumber, jobtime, username ) );
             print "Updating user %s with pages+=%d" % (username, pagenumber)
