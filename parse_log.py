@@ -55,6 +55,8 @@ while True:
 
             if os.fstat( pagelog.fileno() ).st_ino != os.stat( cups_pagelog_location ).st_ino or \
                os.fstat( pagelog.fileno() ).st_dev != os.stat( cups_pagelog_location ).st_dev:
+                
+                print "Reopening page_log after rotation"
 
                 pagelog.close()
                 pagelog = open( cups_pagelog_location, 'r' )
