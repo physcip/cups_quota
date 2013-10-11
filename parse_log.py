@@ -18,7 +18,12 @@ def increasePagecountGetState(username, pagenumber, jobtime):
     
         db_cursor.execute( 'INSERT INTO users (username, pagequota, pagecount, lastjob ) VALUES (?, ?, ?, ? );', ( username, default_page_quota, initial_page_number+pagenumber, jobtime ) );
         print "Creating user %s with quota=%d, pages=%d" % (username, default_page_quota, initial_page_number+pagenumber)
-        return ( username, pagenumber, default_page_quota )
+        
+        if initial_page_number+pagenumber >= default_page_quota:
+            print "Disabling user %s with quota=%d, pages=%d" % (username, default_page_quota, initial_page_count+pagenumber)
+            disablePrinting( username )
+
+        return ( username, initial_page_number+pagenumber, default_page_quota )
     
     else:
     
@@ -26,6 +31,11 @@ def increasePagecountGetState(username, pagenumber, jobtime):
         
             db_cursor.execute( 'UPDATE users SET pagecount = pagecount + ?, lastjob = ? WHERE username = ?;', ( pagenumber, jobtime, username ) );
             print "Updating user %s with pages+=%d" % (username, pagenumber)
+            
+            if state[0] < state[1] and state[0]+pagenumber >= state[1]:
+                print "Disabling user %s with quota=%d, pages=%d" % (username, state[1], state[0]+pagenumber)
+                disablePrinting( username )
+
             return ( username, state[0] + pagenumber, state[1] );
         
         else:
@@ -69,7 +79,3 @@ while True:
                 log_datetime = int( datetime.datetime.strptime( line[3], '[%d/%b/%Y:%H:%M:%S' ).strftime("%s") )
                 
                 username, pagecount, pagequota = increasePagecountGetState( log_username, log_pages, log_datetime )
-                
-                if pagecount >= pagequota:
-                    print "Disabling user %s with quota=%d, pages=%d" % (username, pagequota, pagecount)
-                    disablePrinting( username )
