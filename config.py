@@ -8,10 +8,10 @@ monthly_quota_increase   = 100
 sleep_duration           = 10 #in seconds
 
 def disablePrinting(username):
-    subprocess.call( ['command', 'args'] )
+    subprocess.call( ['touch', 'disable_' + username] )
 
 def enablePrinting(username):
-    subprocess.call( ['command', #args#] )
+    subprocess.call( ['touch', 'enable_' + username] )
 
 webinterface_port        = 8000
 
