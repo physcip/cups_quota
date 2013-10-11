@@ -6,8 +6,11 @@ import re
 import sys
 import os
 import datetime
-sys.path.append(os.path.dirname(__file__))
-os.chdir(os.path.dirname(__file__))
+
+if os.path.dirname(__file__) != '':
+    sys.path.append(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(__file__))
+
 from config                import *
 
 
@@ -43,6 +46,9 @@ def user_interface(env, start_response):
     
     username = escape( d.get( 'username', [''] )[0] )
     pagecount, pagequota = ('', '')
+    current_time = datetime.datetime.now()
+    first_of_next_month = datetime.datetime(current_time.year +current_time.month//12, (current_time.month+1) % 12, 1, 0, 0, 0, 0)
+
     if len( username ) > 0:
     
         try:
@@ -65,14 +71,11 @@ def user_interface(env, start_response):
     html.append( """<input type="text" name="username" value="%s"/>""" % (username)	 )
     if (pagecount != '' and pagequota != ''):
         html.append( """<p>User <b>%s</b> has <b>%s</b> pages left for this month.</p>""" % (username, pagequota-pagecount) )
+        html.append( "<p>Your quota will be increased by %d pages on %s.</p>" % ( monthly_pagenumber_decrease if int(pagecount)-monthly_pagenumber_decrease>0 else pagecount, first_of_next_month.strftime('%Y-%m-%d')))
     elif (no_such_user and len(username) > 0):
         html.append( """<p>User <b>%s</b> is not in our system.</p>""" % (username) )
     html.append( """</form>""" )
     
-    current_time = datetime.datetime.now()
-    first_of_next_month = datetime.datetime(current_time.year +current_time.month//12, (current_time.month+1) % 12, 1, 0, 0, 0, 0)
-    
-    html.append( "<p>Your quota will be increased by %d pages on %s.</p>" % ( monthly_pagenumber_decrease if pagecount-monthly_pagenumber_decrease>0 else pagecount, first_of_next_month.strftime('%Y-%m-%d')))
     html.append( html_footer )
     
     return html
