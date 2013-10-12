@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC -//Apple Computer//DTD PLIST 1.0//EN http://www.apple.com/DTDs/PropertyList-1.0.dtd >
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>de.uni-stuttgart.physcip.cupsquota.logparse</string>
+	<key>UserName</key>
+	<string>root</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Library/Server/Web/Data/WebApps/cups_quota/parse_log.py</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/var/log/cupsquota.log</string>
+	<key>StandardErrorPath</key>
+	<string>/var/log/cupsquota.log</string>
+</dict>
+</plist>
