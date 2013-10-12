@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC -//Apple Computer//DTD PLIST 1.0//EN http://www.apple.com/DTDs/PropertyList-1.0.dtd >
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>de.uni-stuttgart.physcip.cupsquota.recharge</string>
+	<key>UserName</key>
+	<string>root</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Library/Server/Web/Data/WebApps/cups_quota/cron_quota.py</string>
+	</array>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Minute</key>
+		<integer>15</integer>
+		<key>Hour</key>
+		<integer>2</integer>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/var/log/cupsquota.log</string>
+	<key>StandardErrorPath</key>
+	<string>/var/log/cupsquota.log</string>
+</dict>
+</plist>

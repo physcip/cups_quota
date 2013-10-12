@@ -5,6 +5,11 @@ import os
 import subprocess
 import time
 import sys
+
+if os.path.dirname(__file__) != '':
+    sys.path.append(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(__file__))
+
 from config import *
 
 script_start_time = time.time()
