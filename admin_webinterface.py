@@ -67,7 +67,7 @@ def user_interface(env, start_response):
     html = []
     html.append( html_header )
     html.append( """<form method="get">""" )
-    html.append( """<p>Input yout username to query your page quota, that is left over.</p>""" )
+    html.append( """<p>Please input your username to query your leftover page quota.</p>""" )
     html.append( """<input type="text" name="username" value="%s"/>""" % (username)	 )
     if (pagecount != '' and pagequota != ''):
         html.append( """<p>User <b>%s</b> has <b>%s</b> pages left for this month.</p>""" % (username, pagequota-pagecount) )
@@ -109,6 +109,10 @@ def admin_interface(env, start_response):
     
         db_cursor.execute( 'UPDATE users set pagequota = ?, pagecount = ? WHERE username = ?;', ( pagequota, pagecount, username ) );
         db_conn.commit()
+        if pagequota > pagecount:
+            enablePrinting(username)
+        else:
+            disablePrinting(username)
 
     status = '200 OK'
     headers = [ ('Content-type', 'text/html') ]
@@ -122,7 +126,10 @@ def admin_interface(env, start_response):
     
     for entry in db_cursor.execute('SELECT username, pagecount, pagequota FROM users ORDER BY username ASC'):
     
-        html.append( """<tr>""" )
+        if entry[1] > entry[2]:
+            html.append( """<tr style='background-color: red'>""" )
+        else:
+            html.append( """<tr>""" )
         
         html.append( """<td>""" )
         html.append( str( entry[0] ) )
