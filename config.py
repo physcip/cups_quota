@@ -6,7 +6,7 @@ import email.mime.text
 #cups_pagelog_location       = './sample_page_log'
 cups_pagelog_location       = '/var/log/cups/page_log'
 default_page_quota          = 600
-initial_page_number         = 500
+initial_page_number         = 400
 monthly_pagenumber_decrease = 100
 sleep_duration              = 10 #in seconds
 
