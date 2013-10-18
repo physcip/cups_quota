@@ -13,11 +13,25 @@ if os.path.dirname(__file__) != '':
 
 from config                import *
 
+try:
+    import ldap
+    l = ldap.initialize('ldap://%s' % (ldap_node.split('/')[-1]))
+    def username_lookup(username):
+        try:
+            r = l.search_s(ldap_base, ldap.SCOPE_SUBTREE, '%s=%s' % (ldap_uid_attribute, username), ['sn', 'givenName'])
+            return '%s, %s' % (r[0][1]['sn'][0], r[0][1]['givenName'][0])
+        except:
+            return ""
+except:
+    def username_lookup(username):
+        return ""
+
 
 html_header = \
-"""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+"""<!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <style type="text/css">
             .pageinput{ width:3em }
         </style>
@@ -133,6 +147,9 @@ def admin_interface(env, start_response):
         
         html.append( """<td>""" )
         html.append( str( entry[0] ) )
+        html.append( """</td>""" )
+        html.append( """<td>""" )
+        html.append( username_lookup(str( entry[0] )) )
         html.append( """</td>""" )
         
         html.append( """<td>""" )

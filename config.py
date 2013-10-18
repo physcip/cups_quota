@@ -6,7 +6,7 @@ import email.mime.text
 #cups_pagelog_location       = './sample_page_log'
 cups_pagelog_location       = '/var/log/cups/page_log'
 default_page_quota          = 600
-initial_page_number         = 500
+initial_page_number         = 400
 monthly_pagenumber_decrease = 100
 sleep_duration              = 10 #in seconds
 
@@ -14,6 +14,8 @@ ldap_node = '/LDAPv3/purple.physcip.uni-stuttgart.de'
 ldap_user = 'phyregger'
 ldap_password = 'abcdef'
 noprinting_group = 'noprinting'
+ldap_uid_attribute = 'uid'
+ldap_base = 'dc=purple,dc=physcip,dc=uni-stuttgart,dc=de'
 
 smtp_server = 'mailrelay.uni-stuttgart.de'
 mail_from = 'root@robert.physcip.uni-stuttgart.de'
