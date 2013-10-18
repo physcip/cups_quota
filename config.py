@@ -14,6 +14,8 @@ ldap_node = '/LDAPv3/purple.physcip.uni-stuttgart.de'
 ldap_user = 'phyregger'
 ldap_password = 'abcdef'
 noprinting_group = 'noprinting'
+ldap_uid_attribute = 'uid'
+ldap_base = 'dc=purple,dc=physcip,dc=uni-stuttgart,dc=de'
 
 smtp_server = 'mailrelay.uni-stuttgart.de'
 mail_from = 'root@robert.physcip.uni-stuttgart.de'
