@@ -15,12 +15,13 @@ from config                import *
 
 try:
     import ldap
-    l = ldap.initialize('ldap://%s' % (ldap_node.split('/')[-1]))
+    l = ldap.ldapobject.ReconnectLDAPObject('ldap://%s' % (ldap_node.split('/')[-1]), retry_max=5)
     def username_lookup(username):
         try:
-            r = l.search_s(ldap_base, ldap.SCOPE_SUBTREE, '%s=%s' % (ldap_uid_attribute, username), ['sn', 'givenName'])
+            r = l.search_st(ldap_base, ldap.SCOPE_SUBTREE, '%s=%s' % (ldap_uid_attribute, username), ['sn', 'givenName'], timeout=10)
             return '%s, %s' % (r[0][1]['sn'][0], r[0][1]['givenName'][0])
-        except:
+        except Exception as e:
+            print e
             return ""
 except:
     def username_lookup(username):
@@ -61,7 +62,7 @@ def user_interface(env, start_response):
     username = escape( d.get( 'username', [''] )[0] )
     pagecount, pagequota = ('', '')
     current_time = datetime.datetime.now()
-    first_of_next_month = datetime.datetime(current_time.year +current_time.month//12, (current_time.month+1) % 12, 1, 0, 0, 0, 0)
+    first_of_next_month = datetime.datetime(current_time.year +current_time.month//12, (current_time.month+1) if current_time.month < 12 else 1, 1, 0, 0, 0, 0)
 
     if len( username ) > 0:
     
