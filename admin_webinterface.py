@@ -85,8 +85,11 @@ def user_interface(env, start_response):
     html.append( """<p>Please input your username to query your leftover page quota.</p>""" )
     html.append( """<input type="text" name="username" value="%s"/>""" % (username)	 )
     if (pagecount != '' and pagequota != ''):
-        html.append( """<p>User <b>%s</b> has <b>%s</b> pages left for this month.</p>""" % (username, pagequota-pagecount) )
-        html.append( "<p>Your quota will be increased by %d pages on %s.</p>" % ( monthly_pagenumber_decrease if int(pagecount)-monthly_pagenumber_decrease>0 else pagecount, first_of_next_month.strftime('%Y-%m-%d')))
+        if pagecount > pagequota:
+            html.append( """<p>User <b>%s</b> is <b>%s</b> pages over quota. Printing is therefore <b>disabled</b>.<br />""" % (username, pagecount-pagequota) )
+        else:
+            html.append( """<p>User <b>%s</b> has <b>%s</b> pages left.<br />""" % (username, pagequota-pagecount) )
+        html.append( "Your quota will be increased by %d pages on %s.</p>" % ( monthly_pagenumber_decrease if int(pagecount)-monthly_pagenumber_decrease>0 else pagecount, first_of_next_month.strftime('%Y-%m-%d')))
     elif (no_such_user and len(username) > 0):
         html.append( """<p>User <b>%s</b> is not in our system.</p>""" % (username) )
     html.append( """</form>""" )
