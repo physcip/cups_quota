@@ -5,7 +5,7 @@ import re
 
 import sys
 import os
-import datetime
+import datetime, time
 
 if os.path.dirname(__file__) != '':
     sys.path.append(os.path.dirname(__file__))
@@ -19,9 +19,13 @@ try:
     def username_lookup(username):
         try:
             r = l.search_st(ldap_base, ldap.SCOPE_SUBTREE, '%s=%s' % (ldap_uid_attribute, username), ['sn', 'givenName'], timeout=10)
+            if len(r) == 0: # User not found
+                return ""
+            if not 'sn' in r[0][1] or not 'givenName' in r[0][1]: # User has no full name
+                return ""
             return '%s, %s' % (r[0][1]['sn'][0], r[0][1]['givenName'][0])
         except Exception as e:
-            print e
+            print e, username
             return ""
 except:
     def username_lookup(username):
@@ -141,8 +145,9 @@ def admin_interface(env, start_response):
     html.append( html_header )
     
     html.append( """<table>""" )
+    html.append( """<tr><th>User name</th><th>Full name</th><th>Quota used/available</th><th>Last print job</th></tr>""" )
     
-    for entry in db_cursor.execute('SELECT username, pagecount, pagequota FROM users ORDER BY username ASC'):
+    for entry in db_cursor.execute('SELECT username, pagecount, pagequota, lastjob FROM users ORDER BY username ASC'):
     
         if entry[1] > entry[2]:
             html.append( """<tr style='background-color: red'>""" )
@@ -163,6 +168,13 @@ def admin_interface(env, start_response):
         html.append( """<input type="submit" value="save">""" )
         html.append( """</form>""" )
         html.append( """</td>""" )
+        
+        if time.time() - int(entry[3]) < 60*60*12: # printed in the last 12 hours
+            html.append("""<td style="background-color: green">""")
+        else:
+            html.append("""<td>""")
+        html.append(datetime.datetime.fromtimestamp(int(entry[3])).strftime("%Y-%m-%d %H:%M:%S"))
+        html.append("""</td>""")
         
         html.append( """</tr>""" )
         
