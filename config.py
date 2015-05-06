@@ -8,6 +8,7 @@ cups_pagelog_location       = '/var/log/cups/page_log'
 default_page_quota          = 600
 initial_page_number         = 400
 monthly_pagenumber_decrease = 100
+color_factor                = 2
 sleep_duration              = 10 #in seconds
 
 ldap_node = '/LDAPv3/purple.physcip.uni-stuttgart.de'

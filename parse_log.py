@@ -83,6 +83,10 @@ while True:
                 #TODO take time zone into account
                 log_username = line[1]
                 log_pages    = int( line[6] )
+                
+                if line[12] == 'Color':
+                  log_pages = int( log_pages * color_factor )
+
                 log_datetime = int( datetime.datetime.strptime( line[3], '[%d/%b/%Y:%H:%M:%S' ).strftime("%s") )
                 
                 username, pagecount, pagequota = increasePagecountGetState( log_username, log_pages, log_datetime )
