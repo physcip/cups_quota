@@ -5,6 +5,7 @@ import os
 import subprocess
 import time
 import sys
+import re
 
 if os.path.dirname(__file__) != '':
     sys.path.append(os.path.dirname(__file__))
@@ -49,6 +50,7 @@ def increasePagecountGetState(username, pagenumber, jobtime):
 
 
 pagelog   = open( cups_pagelog_location, 'r' )
+printer_default = {}
 
 while True:
 
@@ -84,8 +86,14 @@ while True:
                 log_username = line[1]
                 log_pages    = int( line[6] )
                 
-                if line[12] == 'Color':
+                if not line[0] in printer_default:
+                  out = subprocess.check_output(['lpoptions', '-d', line[0], '-l'])
+                  printer_default[line[0]] = re.search('^SelectColor.*\*([^ \n$]+.*$)', out, re.MULTILINE).group(1)
+                
+                if line[12] == 'Color' or line[12] == 'Auto' or (line[12] == '-' and printer_default[line[0]] != 'Grayscale'):
                   log_pages = int( log_pages * color_factor )
+                if line[10].startswith('A3'):
+                  log_pages *= 2
 
                 log_datetime = int( datetime.datetime.strptime( line[3], '[%d/%b/%Y:%H:%M:%S' ).strftime("%s") )
                 
