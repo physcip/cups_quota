@@ -195,7 +195,7 @@ def application(env, start_response):
     
     urls = [
         (r'^$', user_interface),
-        (r'admin/?$', admin_interface)
+        (r'^admin/?$', admin_interface)
     ]
 
     path = env.get('PATH_INFO', '').lstrip('/')
