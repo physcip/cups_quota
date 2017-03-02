@@ -1,2 +1,3 @@
+cups_quota.conf
 *.pyc
 db/*

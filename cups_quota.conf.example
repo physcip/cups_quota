@@ -1,0 +1,20 @@
+[general]
+cups_pagelog_location = /var/log/cups/page_log
+default_page_quota = 600
+initial_page_number = 400
+monthly_pagenumber_decrease = 100
+color_factor = 2
+sleep_duration = 10 #in seconds
+
+[ldap]
+server = ldaps://dc01.physcip.uni-stuttgart.de ldaps://dc02.physcip.uni-stuttgart.de
+base = dc=physcip,dc=uni-stuttgart,dc=de
+user = phyregger@physcip.uni-stuttgart.de
+password = your_secret_password_here
+noprinting_group = noprinting
+uid_attribute = uid
+
+[mail]
+smtp_server = mailrelay.uni-stuttgart.de
+from = root@robert.physcip.uni-stuttgart.de
+error_recipient = cip-service@physcip.uni-stuttgart.de

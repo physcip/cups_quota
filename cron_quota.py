@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 
 import datetime
@@ -10,7 +10,6 @@ if os.path.dirname(__file__) != '':
     os.chdir(os.path.dirname(__file__))
 
 from config import *
-
 
 def increasePagecountMonthly():
 

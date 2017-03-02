@@ -1,26 +1,32 @@
+#!/usr/bin/env python2
+
 import sqlite3
 import subprocess
 import smtplib
 import email.mime.text
 
-#cups_pagelog_location       = './sample_page_log'
-cups_pagelog_location       = '/var/log/cups/page_log'
-default_page_quota          = 600
-initial_page_number         = 400
-monthly_pagenumber_decrease = 100
-color_factor                = 2
-sleep_duration              = 10 #in seconds
+# Read settings from config file
+from ConfigParser import RawConfigParser
+settings = RawConfigParser()
+settings.read("cups_quota.conf")
 
-ldap_node = '/LDAPv3/purple.physcip.uni-stuttgart.de'
-ldap_user = 'phyregger'
-ldap_password = 'abcdef'
-noprinting_group = 'noprinting'
-ldap_uid_attribute = 'uid'
-ldap_base = 'dc=purple,dc=physcip,dc=uni-stuttgart,dc=de'
+cups_pagelog_location  = settings.get("general", "cups_pagelog_location")
+default_page_quota = settings.get("general", "default_page_quota")
+initial_page_number = settings.get("general", "initial_page_number")
+monthly_pagenumber_decrease = settings.get("general", "monthly_pagenumber_decrease")
+color_factor = settings.get("general", "color_factor")
+sleep_duration = settings.get("general", "sleep_duration")
 
-smtp_server = 'mailrelay.uni-stuttgart.de'
-mail_from = 'root@robert.physcip.uni-stuttgart.de'
-error_recipient = 'cip-service@physcip.uni-stuttgart.de'
+ldap_server = settings.get("ldap", "server")
+ldap_base = settings.get("ldap", "base")
+ldap_user = settings.get("ldap", "user")
+ldap_password = settings.get("ldap", "password")
+noprinting_group = settings.get("ldap", "noprinting_group")
+ldap_uid_attribute = settings.get("ldap", "uid_attribute")
+
+smtp_server = settings.get("mail", "smtp_server")
+mail_from = settings.get("mail", "from")
+error_recipient = settings.get("mail", "error_recipient")
 
 def error_msg(msg):
     print "Send email to %s" % error_recipient
@@ -28,21 +34,7 @@ def error_msg(msg):
     s.sendmail(mail_from, error_recipient, "From: %s\nTo: %s\nSubject: CUPS Quota: User enable/disable error\n\n%s" % (mail_from, error_recipient,msg))
     print msg
 
-def disablePrinting(username):
-    print "Disabling printing for %s" % username
-    try:
-        subprocess.check_output(['dseditgroup', '-o', 'edit', '-n', ldap_node, '-u', ldap_user, '-P', ldap_password, '-a', username, '-t', 'user', noprinting_group], stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
-        error_msg(e.output + "\n\n" + str(e).replace(ldap_password, 'XXXXXXXX'))
-
-def enablePrinting(username):
-    print "Enabling printing for %s" % username
-    try:
-        subprocess.check_output(['dseditgroup', '-o', 'edit', '-n', ldap_node, '-u', ldap_user, '-P', ldap_password, '-d', username, '-t', 'user', noprinting_group], stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
-        error_msg(e.output + "\n\n" + str(e).replace(ldap_password, 'XXXXXXXX'))
-
-webinterface_port        = 8000
+webinterface_port = 8000
 
 db_conn   = sqlite3.connect( 'db/print_quota.db' )
 db_cursor = db_conn.cursor()
