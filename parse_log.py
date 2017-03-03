@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python2.7
 # Parse CUPS log and increase user's page counters based on the contents
 
 import datetime
@@ -81,21 +81,25 @@ while True:
         line = line.split()
         
         if len( line ) >= 12:
-        
             if line[5].isdigit() and line[6].isdigit():
-            
                 #TODO take time zone into account
                 log_username = line[1]
                 log_pages    = int( line[6] )
                 
                 if not line[0] in printer_default:
-                  out = subprocess.check_output(['lpoptions', '-d', line[0], '-l'])
-                  printer_default[line[0]] = re.search('^SelectColor.*\*([^ \n$]+.*$)', out, re.MULTILINE).group(1)
+                    out = subprocess.check_output(['lpoptions', '-d', line[0], '-l'])
+                    match = re.search('^SelectColor.*\*([^ \n$]+.*$)', out, re.MULTILINE)
+
+                    # Ignore printers that don't have a SelectColor option - always assume color as default option
+                    if match:
+                        printer_default[line[0]] = match.group(1)
+                    else:
+                        printer_default[line[0]] = 'Color'
                 
                 if line[12] == 'Color' or line[12] == 'Auto' or (line[12] == '-' and printer_default[line[0]] != 'Grayscale'):
-                  log_pages = int( log_pages * color_factor )
+                    log_pages = int( log_pages * color_factor )
                 if line[10].startswith('A3'):
-                  log_pages *= 2
+                    log_pages *= 2
 
                 log_datetime = int( datetime.datetime.strptime( line[3], '[%d/%b/%Y:%H:%M:%S' ).strftime("%s") )
                 
