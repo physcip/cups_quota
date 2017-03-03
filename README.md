@@ -1,5 +1,4 @@
-This is a small Python script to be used as a deamon to enact printing quotas for CUPS. It tracks CUPS' _page_log_ and maintains a SQLite database to store the printed pages for each user.
-You can supply an external command to take away printer access from a user when the page quota is reached.
+This is a small Python script to be used as a deamon to enact printing quotas for CUPS. It tracks CUPS' _page_log_ and maintains a SQLite database to store the printed pages for each user. Printer access is denied by adding users to a special user group in a remote LDAP directory.
 
 The script handles log rotations properly.
 The timezone information in the log's time information is not currently taken into account.
@@ -14,10 +13,9 @@ The timezone information in the log's time information is not currently taken in
 	cd /Library/Server/Web/Config/apache2/webapps
 	sudo ln -s ../../../Data/WebApps/cups_quota/osx/de.uni-stuttgart.physcip.cupsquota.plist .
 
-Enable the webapp in Server.app and restart the web server.
+Enable the webapp in Server.app (Websites -> Edit Symbol -> Edit Advanced Settings…) and restart the web server.
 
 ## Daemon and cron job
-
 	cd /Library/Server/Web/Data/WebApps/cups_quota
 	sudo cp osx/de.uni-stuttgart.physcip.cupsquota.*.plist /Library/LaunchDaemons
 	cd /Library/LaunchDaemons

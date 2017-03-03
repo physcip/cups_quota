@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# Parse CUPS log and increase user's page counters based on the contents
 
 import datetime
 import os
@@ -12,6 +13,7 @@ if os.path.dirname(__file__) != '':
     os.chdir(os.path.dirname(__file__))
 
 from config import *
+from ldaputils import *
 
 script_start_time = time.time()
 

@@ -1,10 +1,10 @@
 [general]
-cups_pagelog_location = /var/log/cups/page_log
-default_page_quota = 600
-initial_page_number = 400
-monthly_pagenumber_decrease = 100
-color_factor = 2
-sleep_duration = 10 #in seconds
+cups_pagelog_location = /var/log/cups/page_log	; Use sample_page_log for testing
+default_page_quota = 600			; Maximum number of pages a user is allowed to print
+initial_page_number = 400			; New users initially have this many pages in their counter
+monthly_pagenumber_decrease = 100		; Printed page counter decreases by this number on the first of every month
+color_factor = 2				; Colored page counts are multiplied by this factor
+sleep_duration = 10				; Time to wait after each scan of cups page log, in seconds
 
 [ldap]
 server = ldaps://dc01.physcip.uni-stuttgart.de ldaps://dc02.physcip.uni-stuttgart.de
