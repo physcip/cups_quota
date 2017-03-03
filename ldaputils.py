@@ -63,8 +63,11 @@ def set_noprinting_membership(username, membership):
         else:
             if user_dn in group_members_new: group_members_new.remove(user_dn)
 
-        print(group_members)
-        print(group_members_new)
+        # Abort with success in case membership is already the way it is supposed to be
+        if set(group_members) == set(group_members_new):
+            l.unbind_s()
+            return True
+
         ldif = ldap.modlist.modifyModlist({"member" : group_members}, {"member" : group_members_new})
         l.modify_s(group_dn, ldif)
         l.unbind_s()
