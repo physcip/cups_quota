@@ -21,12 +21,22 @@ def get_ldap_userlist():
         l.simple_bind_s(ldap_user, ldap_password)
         results = l.search_st(ldap_base, ldap.SCOPE_SUBTREE, filterstr = "(objectClass=user)", attrlist = [ldap_uid_attribute, "sn", "givenName"], timeout = 10)
 
-        # `results` is a list containing [(cn, {'uid':[...], ...}), (...)]
+        # Get members of noprinting_group so that we can add the noprinting_member = True / False to users in userlist
+        noprinting_results = l.search_st(ldap_base, ldap.SCOPE_SUBTREE, filterstr = "(cn=%s)" % noprinting_group, attrlist = ["member"], timeout = 10)
+        if len(noprinting_results) == 0:
+            error_msg(errstring + "noprinting group was not found on LDAP server.")
+            return False
+        noprinting_members = noprinting_results[0][1]["member"]
+        print(noprinting_members)
+
+        # `results` is a list containing [(dn, {'uid':[...], ...}), (...)]
         # Convert this to a dictionary containing {uid : {'sn' : ..., 'givenName' : ...}}
         uid2attribs = {}
         for r in results:
             if ldap_uid_attribute in r[1]:
                 uid2attribs[r[1][ldap_uid_attribute][0]] = {attrib: r[1][attrib][0] for attrib in r[1].keys()}
+		uid2attribs[r[1][ldap_uid_attribute][0]]["noprinting_member"] = r[0] in noprinting_members
+
         return uid2attribs
 
     except Exception as e:

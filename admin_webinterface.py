@@ -126,13 +126,13 @@ def admin_interface(env, start_response):
     html.append( html_header )
 
     html.append( """<table>""" )
-    html.append( """<tr><th>User name</th><th>Full name</th><th>Quota used/available</th><th>Last print job</th></tr>""" )
+    html.append( """<tr><th>User name</th><th>Full name</th><th>Quota used/available</th><th>Last print job</th><th>noprinting member</th></tr>""" )
 
     # Retrieve list of users from LDAP for full names
     uid2attribs = get_ldap_userlist()
 
     for entry in db_cursor.execute('SELECT username, pagecount, pagequota, lastjob FROM users ORDER BY username ASC'):
-    
+        # Make table row red if printing is disabled
         if entry[1] > entry[2]:
             html.append( """<tr style='background-color: red'>""" )
         else:
@@ -143,13 +143,17 @@ def admin_interface(env, start_response):
         if entry[0] in uid2attribs and "sn" in uid2attribs[entry[0]] and "givenName" in uid2attribs[entry[0]]:
             fullname = "%s, %s" % (uid2attribs[entry[0]]["sn"], uid2attribs[entry[0]]["givenName"])
 
+        # Username
         html.append( """<td>""" )
         html.append( str( entry[0] ) )
         html.append( """</td>""" )
+
+        # Full name
         html.append( """<td>""" )
         html.append( fullname )
         html.append( """</td>""" )
-        
+
+        # Quota used / available
         html.append( """<td>""" )
         html.append( """<form method="post">""" )
         html.append( """<input type="text" name="pagecount" value="%s" class="pageinput"> / <input type="text" name="pagequota" value="%s" class="pageinput"> """ % ( str( entry[1] ), str( entry[2] ) ) )
@@ -157,13 +161,22 @@ def admin_interface(env, start_response):
         html.append( """<input type="submit" value="save">""" )
         html.append( """</form>""" )
         html.append( """</td>""" )
-        
+
+        # Last print job
         if time.time() - int(entry[3]) < 60*60*12: # printed in the last 12 hours
             html.append("""<td style="background-color: green">""")
         else:
             html.append("""<td>""")
         html.append(datetime.datetime.fromtimestamp(int(entry[3])).strftime("%Y-%m-%d %H:%M:%S"))
         html.append("""</td>""")
+
+        # noprinting group membership
+        if entry[0] in uid2attribs:
+            if uid2attribs[entry[0]]["noprinting_member"]:
+                html.append("""<td align="center" style="background-color: red">yes""")
+            else:
+                html.append("""<td align="center" style="background-color: white">no""")
+        html.append( """</td>""" )
 
         html.append( """</tr>""" )
 
