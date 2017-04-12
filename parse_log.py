@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/python
 # Parse CUPS log and increase user's page counters based on the contents
 
 import datetime

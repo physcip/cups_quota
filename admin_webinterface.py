@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/python
 
 from cgi                   import parse_qs, escape
 import re
