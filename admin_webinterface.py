@@ -49,10 +49,11 @@ def user_interface(env, start_response):
     pagecount, pagequota = ('', '')
     current_time = datetime.datetime.now()
     first_of_next_month = datetime.datetime(current_time.year +current_time.month//12, (current_time.month+1) if current_time.month < 12 else 1, 1, 0, 0, 0, 0)
+    lastupdate, = db_cursor.execute( 'SELECT value FROM config WHERE key="lastupdate";' ).fetchone()
 
     if len( username ) > 0:
         try:
-            pagecount, pagequota = db_cursor.execute( 'SELECT pagecount, pagequota FROM users WHERE username = ?;', [username] ).fetchone()
+            pagecount, pagequota, lastjob = db_cursor.execute( 'SELECT pagecount, pagequota, lastjob FROM users WHERE username = ?;', [username] ).fetchone()
             no_such_user = False
         except:
             no_such_user = True
@@ -73,8 +74,10 @@ def user_interface(env, start_response):
         if pagecount > pagequota:
             html.append( """<p>User <b>%s</b> is <b>%s</b> pages over quota. Printing is therefore <b>disabled</b>.<br />""" % (username, pagecount-pagequota) )
         else:
-            html.append( """<p>User <b>%s</b> has <b>%s</b> pages left.<br />""" % (username, pagequota-pagecount) )
-        html.append( "Your quota will be increased by %d pages on %s.</p>" % ( monthly_pagenumber_decrease if int(pagecount)-monthly_pagenumber_decrease>0 else pagecount, first_of_next_month.strftime('%Y-%m-%d')))
+            html.append( """<p>User <b>%s</b> has <b>%s</b> pages left. """ % (username, pagequota-pagecount) )
+        html.append( "The last print job was executed on %s.<br />" % datetime.datetime.fromtimestamp(int(lastjob)).strftime("%Y-%m-%d") )
+        html.append( "Your quota will be automatically increased by %d pages on %s. " % ( monthly_pagenumber_decrease if int(pagecount)-monthly_pagenumber_decrease>0 else pagecount, first_of_next_month.strftime('%Y-%m-%d')))
+        html.append( "It was last increased on %s.</p>" % datetime.datetime.fromtimestamp(lastupdate).strftime("%Y-%m-%d") )
     elif (no_such_user and len(username) > 0):
         html.append( """<p>User <b>%s</b> is not in our system.</p>""" % (username) )
     html.append( """</form>""" )
