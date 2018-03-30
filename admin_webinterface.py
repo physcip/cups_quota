@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
-from cgi                   import parse_qs, escape
+from cgi import parse_qs, escape
 import re
 
 import sys
 import os
 import datetime, time
+import json
 
 if os.path.dirname(__file__) != '':
     sys.path.append(os.path.dirname(__file__))
@@ -32,7 +33,8 @@ html_footer = \
 </html>
 """
 
-
+# TODO: Remove user_interface once physdash is the default method for retrieving printing quota
+# via the getquota API
 def user_interface(env, start_response):
 
     setup_testing_defaults(env)
@@ -86,6 +88,52 @@ def user_interface(env, start_response):
     
     return html
 
+def getquota(env, start_response):
+
+    setup_testing_defaults(env)
+
+    try:
+      request_body_size = int( env.get( 'CONTENT_LENGTH', 0 ) )
+    except ValueError:
+      request_body_size = 0
+
+    request_body = env['QUERY_STRING']
+    d = parse_qs( request_body )
+
+    username = escape( d.get( 'username', [''] )[0] )
+
+    pagecount, pagequota = ('', '')
+    current_time = datetime.datetime.now()
+    first_of_next_month = datetime.datetime(current_time.year +current_time.month//12, (current_time.month+1) if current_time.month < 12 else 1, 1, 0, 0, 0, 0)
+    lastupdate, = db_cursor.execute( 'SELECT value FROM config WHERE key="lastupdate";' ).fetchone()
+
+    if len( username ) > 0:
+        try:
+            pagecount, pagequota, lastjob = db_cursor.execute( 'SELECT pagecount, pagequota, lastjob FROM users WHERE username = ?;', [username] ).fetchone()
+            no_such_user = False
+        except:
+            no_such_user = True
+    else:
+        no_such_user = True
+
+    status = '200 OK'
+    headers = [ ('Content-type', 'application/json') ]
+
+    start_response( status, headers )
+
+    res = {}
+    if (pagecount != '' and pagequota != ''):
+        res["pagequota"] = pagequota
+        res["pagecount"] = pagecount
+        res["lastjob"] = datetime.datetime.fromtimestamp(int(lastjob)).strftime("%Y-%m-%d")
+        res["increasecount"] = monthly_pagenumber_decrease if int(pagecount) - monthly_pagenumber_decrease > 0 else pagecount
+        res["nextincrease"] = first_of_next_month.strftime('%Y-%m-%d')
+    elif (no_such_user and len(username) > 0):
+        res["error"] = "USER_NOT_FOUND"
+    else:
+        res["error"] = "OTHER"
+
+    return json.dumps(res) + '\n'
 
 def admin_interface(env, start_response):
 
@@ -198,7 +246,8 @@ def application(env, start_response):
 
     urls = [
         (r'^$', user_interface),
-        (r'^admin/?$', admin_interface)
+        (r'^admin/?$', admin_interface),
+        (r'^getquota/?$', getquota)
     ]
 
     path = env.get('PATH_INFO', '').lstrip('/')
