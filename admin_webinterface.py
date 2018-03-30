@@ -117,7 +117,7 @@ def getquota(env, start_response):
         no_such_user = True
 
     status = '200 OK'
-    headers = [ ('Content-type', 'application/json') ]
+    headers = [ ('Content-type', 'application/json'), ('Access-Control-Allow-Origin', '*') ]
 
     start_response( status, headers )
 
